@@ -1,0 +1,45 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+body {
+  margin: 0;
+}
+
+:root {
+  font-family: Google Sans;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* color-scheme: light dark;
+  color: white;
+  background-color: #242424;
+  text-align: center;
+  margin: 0;
+  padding: 0 7.5%; */
+}
+
+/* nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+  background-color: red;
+  gap: 1em;
+  margin-bottom: 2em;
+  height: 10vh;
+  padding-inline: 7.5%;
+}
+
+.nav-list {
+  display: flex;
+  gap: 1em;
+}
+
+.logo {
+  font-weight: bold;
+}
+
+h1 {
+  background-color: blue;
+} */
