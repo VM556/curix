@@ -1,71 +1,47 @@
-import Option from "./Option";
-
-function FullInput(props) {
-  console.log(props);
+export default function FullInput(props) {
   return (
-    <div>
-      <label htmlFor={props.htmlFor} className="p-2 block">
-        {props.name}:
-      </label>
-      <div className="p-2 flex justify-center items-center rounded-lg bg-gray-200 ">
-        <input
-          type="text"
-          defaultValue="1"
-          className="input m-1 w-11 text-right text-xl"
-        />
-        <p className=" m-1">|</p>
-        <img
-          src={props.whichCountry?.flags?.svg}
-          alt={props.whichCountry?.name?.common}
-          className=" m-1 h-12 w-20 rounded-md"
-        />
-        <select
-          id="baseCurrency"
-          value={props.currencyFor}
-          onChange={(e) =>
-            props.handleOptionChange(e.target.value, props.htmlFor)
-          }
-          className="px-4 py-2 "
-          suppressHydrationWarning
-        >
-          {props.allCountries &&
-            props.allCountries.map((country) => (
-              <option
-                key={country?.cca2}
-                value={country?.cca3 ? country?.cca3 : "Whatever"}
-                // onChange={props.handleOptionChange}
-              >
-                {country?.currencies
-                  ? Object.values(country?.currencies)[0]?.name
-                  : "Whatever"}
-              </option>
-            ))}
-        </select>
+    <div className="card w-125 bg-base-100 shadow-xl border border-gray-300">
+      <div className="card-body ">
+        <h2 className="card-title text-base-content">{props.name}</h2>
 
-        {/* <div className="dropdown m-1">
-          <div tabIndex={0} role="button" className="btn m-1 w-64 text-left">
-            {props.whichCountry?.currencies &&
-              Object.values(props.whichCountry?.currencies)[0]?.name}
+        {/* Flags Container */}
+        <div className="flex flex-wrap gap-2">
+          {props.allCurrencies &&
+            props?.country[0]?.countryFlags.map((flag, index) => (
+              <div key={index} className="avatar">
+                <div className="w-12 rounded-sm">
+                  <img src={flag} alt={props?.country?.name} />
+                </div>
+              </div>
+            ))}
+        </div>
+
+        {/* Input Group */}
+        <div className="join w-full bg-base-200 rounded-box">
+          <div className="join-item">
+            <input
+              type="text"
+              value={props.rate}
+              className="input input-ghost w-24 text-right text-xl font-medium"
+            />
           </div>
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+          <div className="divider divider-horizontal mx-0">|</div>
+          <select
+            className="select select-ghost join-item flex-1"
+            value={props?.country[0]?.name}
+            onChange={(e) => {
+              props.handleCurrencySelection(e.target.value, props.htmlFor);
+            }}
           >
-            {props.allCountries &&
-              props.allCountries.map((country) => (
-                <li>
-                  <a>
-                    {country?.currencies
-                      ? Object.values(country?.currencies)[0]?.name
-                      : "Whatever"}
-                  </a>
-                </li>
+            {props.allCurrencies &&
+              props.allCurrencies.map((currency, index) => (
+                <option key={index} value={currency.name || "Not Available"}>
+                  {currency.name || "Not Available"}
+                </option>
               ))}
-          </ul>
-        </div> */}
+          </select>
+        </div>
       </div>
     </div>
   );
 }
-
-export default FullInput;

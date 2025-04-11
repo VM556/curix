@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Nav() {
   return (
-    <nav className="bg-gray-400 p-4">
+    <nav className="bg-gray-200 p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-lg font-bold">Curix</div>
         <div className="hidden md:flex space-x-4">
