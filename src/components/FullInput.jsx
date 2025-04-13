@@ -1,8 +1,11 @@
 import { getRate } from "../services/exchangeRateAPI";
 import FullInputSkeleton from "./skeletons/FullInputSkeleton";
 import { Suspense } from "react";
+import { useTheme } from "../contexts/ThemeContext";
+import clsx from "clsx";
 
 export default function FullInput(props) {
+  const { darkMode } = useTheme();
   return (
     <>
       <Suspense fallback={<FullInputSkeleton />}>
@@ -11,30 +14,35 @@ export default function FullInput(props) {
             <div className="skeleton w-12 h-12 rounded-full"></div>
           </FullInputSkeleton>
         ) : (
-          <div className="card w-2xs md:w-125 bg-base-100 shadow-xl border border-gray-300">
+          <div className="card w-2xs md:w-lg bg-base-100 shadow-xl border border-gray-300">
             <div className="card-body ">
               <h2 className="card-title text-base-content">{props.name}</h2>
 
               {/* Flags Container */}
-              <div className="hidden md:flex flex-wrap gap-1 mb-2.5">
+              <div className="hidden md:flex flex-wrap gap-2.75 mb-2.5">
                 {props.allCurrencies &&
                   props?.country?.countryFlags.map((flag, index) => (
                     <div
                       key={index}
-                      className="hidden md:tooltip"
+                      className="tooltip"
                       data-tip={props?.country?.countries?.[index] || "Unknown"}
                     >
                       <img
                         src={flag}
                         alt={props?.country?.name}
-                        className="w-14 h-9 object-cover rounded-lg"
+                        className="w-14 h-9 object-cover rounded-md"
                       />
                     </div>
                   ))}
               </div>
 
               {/* Input Group */}
-              <div className="join w-full bg-base-200 rounded-box flex flex-col sm:flex-row items-center justify-center">
+              <div
+                className={clsx(
+                  darkMode ? "bg-gray-800" : "bg-gray-200",
+                  "join w-full rounded-box flex flex-col sm:flex-row items-center justify-center"
+                )}
+              >
                 <div className="join-item relative w-full sm:w-fit flex items-center justify-end ">
                   {!/[a-zA-Z]/.test(props?.country?.symbol || "") && (
                     <span className="absolute left-4 text-xl pointer-events-none z-1">
@@ -45,10 +53,12 @@ export default function FullInput(props) {
                     type="text"
                     inputMode="decimal"
                     pattern="[0-9]*"
-                    value={props.baseValue ?? props.rate ?? ""} // Ensure value is never undefined
+                    value={props.rate ?? props.baseValue.toLocaleString() ?? ""} // Ensure value is never undefined
                     onChange={(e) => {
                       console.log(e.target.value);
-                      props.setBaseValue(e.target.value);
+                      props.setBaseValue(
+                        Number(e.target.value.replace(/,/g, ""))
+                      );
                     }}
                     readOnly={props.htmlFor === "targetCurrency"}
                     className={`input input-ghost w-full max-w-50 text-right text-xl focus:outline-none focus:bg-base-200 px-4 ${

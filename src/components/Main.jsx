@@ -1,13 +1,15 @@
 import { Suspense, useState, useEffect } from "react";
+import clsx from "clsx";
 import { getRate } from "../services/exchangeRateAPI";
 import Option from "./Option";
 import FullInput from "./FullInput";
 import { fetchCountries } from "../services/countriesAPI";
 import allCurrencies from "../data/currencies.json";
 import SwapButton from "./SwapButton";
-// import { fetchCountries } from "../services/countriesAPI";
+import { useTheme } from "../contexts/ThemeContext";
 
 export default function Main() {
+  const { darkMode } = useTheme();
   const API_KEY = import.meta.env.VITE_EXCHANGE_RATE_API_KEY;
 
   const INITIAL_CURRENCIES = ["Australian dollar", "United States dollar"];
@@ -76,7 +78,8 @@ export default function Main() {
       const { conversion_rates: conversionRates } = await response.json();
       console.log(conversionRates);
       let rate = conversionRates[targetCurrency];
-      rate = rate * baseValue;
+      rate = (rate * baseValue).toFixed(2);
+      rate = Number(rate).toLocaleString();
       console.log("Final Rate:", rate);
       setRate(rate);
       console.log(
@@ -195,41 +198,45 @@ export default function Main() {
   // }
 
   return (
-    <>
-      <div className="flex flex-col mt-7 md:mt-7 items-center justify-center  max-h-screen text-2xl ">
-        {!isLoading && <div className="flex flex-col items-start my-5 w-2xs md:w-125">
-          <h2 className="text-slate-700 text-lg">
-            {`${baseValue} ${baseCurrency} equals`}
+    <div
+      className={`flex flex-col items-center justify-center max-h-screen text-2xl transition-all duration-300`}
+    >
+      {!isLoading && (
+        <div className="flex flex-col items-start my-5 w-2xs md:w-125">
+          <h2 className={clsx("text-gray-600: ", "text-lg font-normal")}>
+            {`${Number(baseValue).toLocaleString()} ${
+              baseCountry[0]?.name
+            } equals`}
           </h2>
-          <h1>{`${rate} ${targetCountry[0]?.name}`}</h1>
-        </div>}
-        <form className="flex flex-col justify-center items-center space-y-4 text-2xl">
-          <FullInput
-            htmlFor="baseCurrency" // For the form essentially
-            name="Convert from" // Name for the label
-            country={baseCountry[0]} // Country object or array of objects (multiple countries)
-            baseValue={baseValue}
-            // currencyFor={baseCurrency} // Needs to be removed
-            // setCurrency={setBaseCurrency}
-            isLoading={isLoading}
-            allCurrencies={allCurrencies} // allCurrencies JSON
-            handleCurrencySelection={handleCurrencySelection} // passing down handleOptionChange function
-            setBaseValue={setBaseValue}
-          />
-          <SwapButton swapCountries={swapCountries} />
-          <FullInput
-            htmlFor="targetCurrency" // For the form essentially
-            name="To" // Name for the label
-            country={targetCountry[0]} // Country object or array of objects (multiple countries)
-            rate={rate}
-            // currencyFor={targetCurrency} // Needs to be removed
-            // setCurrency={setTargetCurrency}
-            isLoading={isLoading}
-            allCurrencies={allCurrencies} // allCurrencies JSON
-            handleCurrencySelection={handleCurrencySelection} // passing down handleOptionChange function
-          />
-        </form>
-      </div>
-    </>
+          <h1 className="font-semibold">{`${rate} ${targetCountry[0]?.name}`}</h1>
+        </div>
+      )}
+      <form className="flex flex-col justify-center items-center text-2xl">
+        <FullInput
+          htmlFor="baseCurrency" // For the form essentially
+          name="Convert from:" // Name for the label
+          country={baseCountry[0]} // Country object or array of objects (multiple countries)
+          baseValue={baseValue}
+          // currencyFor={baseCurrency} // Needs to be removed
+          // setCurrency={setBaseCurrency}
+          isLoading={isLoading}
+          allCurrencies={allCurrencies} // allCurrencies JSON
+          handleCurrencySelection={handleCurrencySelection} // passing down handleOptionChange function
+          setBaseValue={setBaseValue}
+        />
+        <SwapButton swapCountries={swapCountries} />
+        <FullInput
+          htmlFor="targetCurrency" // For the form essentially
+          name="To:" // Name for the label
+          country={targetCountry[0]} // Country object or array of objects (multiple countries)
+          rate={rate}
+          // currencyFor={targetCurrency} // Needs to be removed
+          // setCurrency={setTargetCurrency}
+          isLoading={isLoading}
+          allCurrencies={allCurrencies} // allCurrencies JSON
+          handleCurrencySelection={handleCurrencySelection} // passing down handleOptionChange function
+        />
+      </form>
+    </div>
   );
 }

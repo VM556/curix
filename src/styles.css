@@ -1,45 +1,42 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'Axiforma';
+    src: url('./assets/fonts/AxiformaRegular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Axiforma';
+    src: url('./assets/fonts/AxiformaBold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Axiforma';
+    src: url('./assets/fonts/AxiformaItalic.otf') format('opentype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+  }
+}
+
 body {
   margin: 0;
 }
 
 :root {
-  font-family: Google Sans;
+  font-family: 'Axiforma', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* color-scheme: light dark;
-  color: white;
-  background-color: #242424;
-  text-align: center;
-  margin: 0;
-  padding: 0 7.5%; */
 }
-
-/* nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 100%;
-  background-color: red;
-  gap: 1em;
-  margin-bottom: 2em;
-  height: 10vh;
-  padding-inline: 7.5%;
-}
-
-.nav-list {
-  display: flex;
-  gap: 1em;
-}
-
-.logo {
-  font-weight: bold;
-}
-
-h1 {
-  background-color: blue;
-} */
