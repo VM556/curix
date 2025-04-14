@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import clsx from "clsx";
 import FullInput from "./FullInput";
 import allCurrencies from "../data/currencies.json";
@@ -19,34 +19,68 @@ export default function Main() {
   const [baseCountry, setBaseCountry] = useState("");
   const [targetCountry, setTargetCountry] = useState("");
   // Rate
-  const [baseValue, setBaseValue] = useState("1");
+  const [baseValue, setBaseValue] = useState(1);
   const [rate, setRate] = useState("");
-  const [allRates, setAllRates] = useState("");
+  const [allRates, setAllRates] = useState(null);
 
-  // Step 1 Initiator
+  // Step 1: Handle currency selection
+  const handleCurrencySelection = useCallback(
+    (currency, source) => {
+      log("Starting handleCurrencySelection function...", currency, source);
+      try {
+        const selectedCurrency = allCurrencies.find((c) => c.name === currency);
+
+        if (!selectedCurrency) {
+          throw new Error("Couldn't find currency in allCurrencies");
+        }
+
+        if (source === "baseCurrency") {
+          setBaseCurrency(selectedCurrency.currencyCode);
+          setBaseCountry([selectedCurrency]);
+        } else if (source === "targetCurrency") {
+          setTargetCurrency(selectedCurrency.currencyCode);
+          setTargetCountry([selectedCurrency]);
+        } else {
+          throw new Error("Edge Case while setting the country or currency");
+        }
+      } catch (err) {
+        console.error("Error in handleCurrencySelection:", err);
+      }
+    },
+    [
+      allCurrencies,
+      setBaseCurrency,
+      setBaseCountry,
+      setTargetCurrency,
+      setTargetCountry,
+    ]
+  );
+
+  // Step 2: Fetch initial data and set currencies
   useEffect(() => {
-    // Initially fetch the country details
-    async function initiateCountries() {
+    const initialize = async () => {
       setIsLoading(true);
       try {
         await handleCurrencySelection(INITIAL_CURRENCIES[0], "baseCurrency");
         await handleCurrencySelection(INITIAL_CURRENCIES[1], "targetCurrency");
       } catch (err) {
-        throw new Error(err);
+        console.error("Error initializing currencies:", err);
       } finally {
         setIsLoading(false);
       }
-    }
-    initiateCountries();
-  }, []);
+    };
 
-  // Step 3
+    initialize();
+  }, [handleCurrencySelection]);
+
+  // Step 3: Fetch exchange rates
   useEffect(() => {
-    async function fetchRate() {
+    const fetchRate = async () => {
       if (!baseCurrency || !targetCurrency) {
         console.error("Currency not loaded in fetchRate");
         return;
       }
+
       try {
         const response = await fetch(
           `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/${baseCurrency}`
@@ -57,63 +91,63 @@ export default function Main() {
         const data = await response.json();
         log("allRates (OUTGOING):", data.conversion_rates);
         setAllRates(data.conversion_rates);
-        console.info(
-          `Exchange rate from ${baseCurrency} to ${targetCurrency}: ${data.conversion_rates[targetCurrency]}`
-        );
       } catch (err) {
-        throw new Error("Could not fetch the rate", err);
+        console.error("Could not fetch the rate", err);
       }
-    }
-    fetchRate();
-  }, [baseCountry, targetCountry]);
+    };
 
-  // Step 4
+    fetchRate();
+  }, [baseCurrency, targetCurrency, API_KEY]);
+
+  // Step 4: Calculate and set the rate
   useEffect(() => {
-    async function calculateRate() {
+    const calculateRate = async () => {
       if (!baseValue || baseValue === 0) {
         log("Base value is zero or not set, skipping rate calculation.");
         return;
       }
-      if (!baseCurrency || !targetCurrency) {
-        log("Currency Error: baseCurrency or targetCurrency not set.");
-        return;
-      }
-      if (!allRates) {
-        log("Currencies loaded but allRates not loaded");
-        return;
-      }
-      if (baseValue.slice(-1) == ".") {
-        return;
-      }
-      try {
-        const newBaseValue = baseValue.replace(/,/g, "");
-        log("allRates (INCOMING):", allRates);
-        let rate = allRates[targetCurrency];
-        rate = (rate * newBaseValue).toFixed(3);
-        rate = Number(rate).toLocaleString();
-        log("Final Rate:", rate);
-        setRate(rate);
-      } catch (err) {
-        throw new Error("Error calculating rate:", err);
-      }
-    }
-    calculateRate();
-  }, [baseCountry, targetCountry, baseValue, allRates]);
 
-  // Step 5
-  // Useless console logs
+      if (!baseCurrency || !targetCurrency) {
+        console.error(
+          "Currency Error: baseCurrency or targetCurrency not set."
+        );
+        return;
+      }
+
+      if (!allRates) {
+        console.log("Currencies loaded but allRates not loaded");
+        return;
+      }
+
+      try {
+        let newRate = allRates[targetCurrency];
+        if (newRate === undefined) {
+          console.error(
+            `Target currency ${targetCurrency} not found in conversion rates.`
+          );
+          return;
+        }
+        newRate = (newRate * baseValue).toFixed(2);
+        newRate = Number(newRate).toLocaleString();
+        log("Final Rate:", newRate);
+        setRate(newRate);
+        log(
+          `Exchange rate from ${baseCurrency} to ${targetCurrency}: ${newRate}`
+        );
+      } catch (error) {
+        console.error("Error calculating rate:", error);
+      }
+    };
+
+    calculateRate();
+  }, [baseValue, targetCurrency, allRates]);
+
+  // Step 5: Log state (for debugging)
   useEffect(() => {
     log(
-      "(U) Base Country:",
-      baseCountry,
-      ", (U) Target Country:",
-      targetCountry,
-      ", (U) Base Value:",
-      baseValue,
-      ", (U) Rate:",
-      rate
+      `(U) Base Country: ${baseCountry}, Target Country: ${targetCountry}, Base Value: ${baseValue}, Rate: ${rate}`
     );
-  }, [baseCountry, targetCountry, baseValue, rate]);
+  }, [baseCountry, targetCountry, baseValue]);
 
   function swapCountries(event) {
     event.preventDefault();
@@ -128,28 +162,6 @@ export default function Main() {
     setIsLoading(false);
   }
 
-  // Step 2
-  function handleCurrencySelection(currency, source) {
-    log("Starting handleCurrencySelection function...", currency, source);
-    try {
-      const selectedCurrency = allCurrencies.find((c) => c.name === currency);
-      if (!selectedCurrency) {
-        throw new Error("Couldn't find currency in allCurrencies");
-      }
-      if (source === "baseCurrency") {
-        setBaseCurrency(selectedCurrency.currencyCode);
-        setBaseCountry([selectedCurrency]);
-      } else if (source === "targetCurrency") {
-        setTargetCurrency(selectedCurrency.currencyCode);
-        setTargetCountry([selectedCurrency]);
-      } else {
-        throw new Error("Edge Case while setting the country or currency");
-      }
-    } catch (err) {
-      console.error("Error in handleCurrencySelection:", err);
-    }
-  }
-
   return (
     <div
       className={`flex flex-col items-center justify-center max-h-screen text-2xl transition-all duration-300`}
@@ -157,7 +169,9 @@ export default function Main() {
       {!isLoading && (
         <div className="flex flex-col items-start my-5 w-2xs md:w-125">
           <h2 className={clsx("text-gray-600: ", "text-lg font-normal")}>
-            {`${baseValue} ${baseCountry[0]?.name} equals`}
+            {`${Number(baseValue).toLocaleString()} ${
+              baseCountry[0]?.name
+            } equals`}
           </h2>
           <h1 className="font-semibold">{`${rate} ${targetCountry[0]?.name}`}</h1>
         </div>
@@ -168,8 +182,6 @@ export default function Main() {
           name="Convert from:" // Name for the label
           country={baseCountry[0]} // Country object or array of objects (multiple countries)
           baseValue={baseValue}
-          // currencyFor={baseCurrency} // Needs to be removed
-          // setCurrency={setBaseCurrency}
           isLoading={isLoading}
           allCurrencies={allCurrencies} // allCurrencies JSON
           handleCurrencySelection={handleCurrencySelection} // passing down handleOptionChange function
@@ -181,8 +193,6 @@ export default function Main() {
           name="To:" // Name for the label
           country={targetCountry[0]} // Country object or array of objects (multiple countries)
           rate={rate}
-          // currencyFor={targetCurrency} // Needs to be removed
-          // setCurrency={setTargetCurrency}
           isLoading={isLoading}
           allCurrencies={allCurrencies} // allCurrencies JSON
           handleCurrencySelection={handleCurrencySelection} // passing down handleOptionChange function
