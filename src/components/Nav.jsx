@@ -2,12 +2,14 @@
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 import { useTheme } from "../contexts/ThemeContext";
 import clsx from "clsx";
+import log from '../utils/logger'
+
 
 export default function Nav() {
   const { darkMode, toggleDarkMode } = useTheme();
 
   // useEffect(() => {
-  //   console.log("Dark mode:", darkMode);
+  //   log("Dark mode:", darkMode);
   //   document.documentElement.setAttribute(
   //     "data-theme",
   //     darkMode ? "dark" : "light"
@@ -27,12 +29,14 @@ export default function Nav() {
       <div className="w-2xs md:w-lg lg:w-7xl md:mx-auto max-w-screen flex justify-between items-center">
         <div
           className={clsx(
-            "text-4xl pt-1 transition-colors duration-200",
-            { "text-slate-200": darkMode, "text-slate-800": !darkMode },
-            "font-semibold"
+            "text-4xl transition-colors duration-200 font-bold pt-2",
+            {
+              "text-slate-200": darkMode,
+              "text-slate-800": !darkMode,
+            }
           )}
         >
-          Curix
+          <i>CURIX</i>
         </div>
         <button
           onClick={toggleDarkMode}

@@ -14,8 +14,8 @@ export const fetchCountries = async () => {
 // fetchCountries();
 
 // // function logger() {
-// console.log(countries);
-//   console.log(countries[0].flags);
-//   console.log(countries[0].flags.svg);
+// log(countries);
+//   log(countries[0].flags);
+//   log(countries[0].flags.svg);
 // }
 // logger();

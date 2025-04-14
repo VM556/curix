@@ -48,7 +48,7 @@ async function fetchCurrencyData() {
       "utf-8"
     );
 
-    console.log("Currencies data saved to currencies.json");
+    log("Currencies data saved to currencies.json");
   } catch (error) {
     console.error("Error fetching currency data:", error);
   }

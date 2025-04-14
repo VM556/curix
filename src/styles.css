@@ -1,42 +1,48 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-@tailwind utilities;
-
 @layer base {
   @font-face {
-    font-family: 'Axiforma';
-    src: url('./assets/fonts/AxiformaRegular.otf') format('opentype');
+    font-family: "Axiforma";
+    src: url("./assets/fonts/AxiformaRegular.otf") format("opentype");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
   }
 
   @font-face {
-    font-family: 'Axiforma';
-    src: url('./assets/fonts/AxiformaBold.otf') format('opentype');
+    font-family: "Axiforma";
+    src: url("./assets/fonts/AxiformaBold.otf") format("opentype");
     font-weight: bold;
     font-style: normal;
     font-display: swap;
   }
 
   @font-face {
-    font-family: 'Axiforma';
-    src: url('./assets/fonts/AxiformaItalic.otf') format('opentype');
+    font-family: "Axiforma";
+    src: url("./assets/fonts/AxiformaBoldItalic.otf") format("opentype");
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Axiforma";
+    src: url("./assets/fonts/AxiformaItalic.otf") format("opentype");
     font-weight: normal;
     font-style: italic;
     font-display: swap;
   }
 }
 
-body {
-  margin: 0;
-}
-
 :root {
-  font-family: 'Axiforma', sans-serif;
+  font-family: "Axiforma", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
 }

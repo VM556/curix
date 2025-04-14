@@ -4,18 +4,16 @@ export async function getRate() {
   const response = await fetch(
     `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/${baseCurrency}`
   );
-  console.log("response:", response);
+  log("response:", response);
   const { conversion_rates: conversionRates } = await response.json();
-  console.log(conversionRates);
+  log(conversionRates);
   const rate = conversionRates[targetCurrency];
-  console.log(
-    `Exchange rate from ${baseCurrency} to ${targetCurrency}: ${rate}`
-  );
+  log(`Exchange rate from ${baseCurrency} to ${targetCurrency}: ${rate}`);
 }
 
 // // function logger() {
-// console.log(countries);
-//   console.log(countries[0].flags);
-//   console.log(countries[0].flags.svg);
+// log(countries);
+//   log(countries[0].flags);
+//   log(countries[0].flags.svg);
 // }
 // logger();

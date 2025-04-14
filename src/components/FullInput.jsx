@@ -3,9 +3,25 @@ import FullInputSkeleton from "./skeletons/FullInputSkeleton";
 import { Suspense } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import clsx from "clsx";
+import log from "../utils/logger";
 
 export default function FullInput(props) {
   const { darkMode } = useTheme();
+  const symbolOnRight = /[a-zA-Z]/.test(props?.country?.symbol || "");
+
+  function handleInputChange(e) {
+    const value = e.target.value.replace(/,/g, ""); // Get the input value from the event
+    // Only allow numbers and decimal point
+    if (/^\d*\.?\d*$/.test(value)) {
+      props.setBaseValue(value.replace(/,/g, "")); // Update the base value with the new input
+    } else {
+      log("Invalid key pressed");
+      console.warn(
+        `Invalid input: "${value}". Only numeric values and a decimal point are allowed.`
+      );
+    }
+  }
+
   return (
     <>
       <Suspense fallback={<FullInputSkeleton />}>
@@ -44,8 +60,8 @@ export default function FullInput(props) {
                 )}
               >
                 <div className="join-item relative w-full sm:w-fit flex items-center justify-end ">
-                  {!/[a-zA-Z]/.test(props?.country?.symbol || "") && (
-                    <span className="absolute left-4 text-xl pointer-events-none z-1">
+                  {!symbolOnRight && (
+                    <span className="absolute left-2 md:left-4 pt-3 md:pt-0 text-xl pointer-events-none z-1">
                       {props?.country?.symbol}
                     </span>
                   )}
@@ -53,25 +69,20 @@ export default function FullInput(props) {
                     type="text"
                     inputMode="decimal"
                     pattern="[0-9]*"
-                    value={props.rate ?? props.baseValue.toLocaleString() ?? ""} // Ensure value is never undefined
-                    onChange={(e) => {
-                      console.log(e.target.value);
-                      props.setBaseValue(
-                        Number(e.target.value.replace(/,/g, ""))
-                      );
-                    }}
+                    value={
+                      props.rate ??
+                      (props.baseValue &&
+                        Number(props.baseValue).toLocaleString())
+                    }
+                    onChange={(e) => handleInputChange(e)}
                     readOnly={props.htmlFor === "targetCurrency"}
-                    className={`input input-ghost w-full max-w-50 text-right text-xl focus:outline-none focus:bg-base-200 px-4 ${
+                    className={`input input-ghost w-full pt-3 md:pt-0.25 left-2 md:left-4  text-left text-xl focus:outline-none focus:bg-transparent active:bg-transparent px-3 ${
                       props.htmlFor === "targetCurrency" &&
                       "pointer-events-none"
-                    } ${
-                      !/[a-zA-Z]/.test(props?.country?.symbol || "")
-                        ? "pl-6"
-                        : "pr-6"
                     }`}
                   />
-                  {/[a-zA-Z]/.test(props?.country?.symbol || "") && (
-                    <span className="absolute right-4 text-xl pointer-events-none z-1">
+                  {symbolOnRight && (
+                    <span className="absolute right-2 pt-3 md:pt-0 text-xl pointer-events-none z-1">
                       {props?.country?.symbol}
                     </span>
                   )}
@@ -80,7 +91,7 @@ export default function FullInput(props) {
                 <div className="divider divider-vertical m-0 md:divider-horizontal" />
 
                 <select
-                  className="select select-ghost join-item  text-xl focus:outline-none focus:bg-base-200"
+                  className="select select-ghost join-item  text-xl focus:outline-none focus:bg-transparent active:bg-transparent"
                   value={props?.country?.name}
                   onChange={(e) => {
                     props.handleCurrencySelection(

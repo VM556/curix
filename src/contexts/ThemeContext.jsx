@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
+import log from "../utils/logger";
 
 const ThemeContext = createContext();
 
@@ -8,7 +9,7 @@ export const ThemeProvider = ({ children }) => {
       window.matchMedia("(prefers-color-scheme: dark)").matches
   );
   useEffect(() => {
-    console.log("Dark mode:", darkMode);
+    log("Dark mode:", darkMode);
     document.documentElement.setAttribute(
       "data-theme",
       darkMode ? "dark" : "light"

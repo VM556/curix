@@ -1,5 +1,5 @@
 export default function Option({ country }) {
-  console.log("THIS:", country?.currencies);
+  log("THIS:", country?.currencies);
   return (
     <option
       // key={country?.cca2}

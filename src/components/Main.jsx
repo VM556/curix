@@ -7,6 +7,7 @@ import { fetchCountries } from "../services/countriesAPI";
 import allCurrencies from "../data/currencies.json";
 import SwapButton from "./SwapButton";
 import { useTheme } from "../contexts/ThemeContext";
+import log from '../utils/logger'
 
 export default function Main() {
   const { darkMode } = useTheme();
@@ -37,7 +38,7 @@ export default function Main() {
   //       if (!response.ok) throw new Error("Network response was not ok");
   //       const data = await response.json();
   //       setAllCountries(data);
-  //       console.log("allCountries", allCountries);
+  //       log("allCountries", allCountries);
   //     } catch (err) {
   //       throw new Error("There was a problem with the fetch operation:", err);
   //     }
@@ -59,42 +60,40 @@ export default function Main() {
 
   useEffect(() => {
     // get exchange rate
-    // console.log("BaseValue before getRate()", baseValue);
-    // console.log("NAN:", Number.isNaN(baseValue));
+    // log("BaseValue before getRate()", baseValue);
+    // log("NAN:", Number.isNaN(baseValue));
     if (!baseValue || baseValue == 0) {
-      console.log("return 1");
+      log("return 1");
       return;
     }
 
     async function getRate() {
       if (!baseCurrency || !targetCurrency) {
-        console.log("return 2");
+        log("return 2");
         return;
       }
       const response = await fetch(
         `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/${baseCurrency}`
       );
-      // console.log("response:", response);
+      // log("response:", response);
       const { conversion_rates: conversionRates } = await response.json();
-      console.log(conversionRates);
+      log(conversionRates);
       let rate = conversionRates[targetCurrency];
       rate = (rate * baseValue).toFixed(2);
       rate = Number(rate).toLocaleString();
-      console.log("Final Rate:", rate);
+      log("Final Rate:", rate);
       setRate(rate);
-      console.log(
-        `Exchange rate from ${baseCurrency} to ${targetCurrency}: ${rate}`
-      );
+      log(`Exchange rate from ${baseCurrency} to ${targetCurrency}: ${rate}`);
     }
     baseValue && getRate();
   }, [baseCurrency, targetCurrency, baseValue]);
 
   // Useless console logs
   useEffect(() => {
-    console.log("Base Country: ", baseCountry);
-    console.log("Target Country: ", targetCountry);
-    console.log("Base Value: ", baseValue);
-    console.log("Rate: ", rate);
+    log("Base Country: ", baseCountry);
+    log("Target Country: ", targetCountry);
+    log("Base Value: ", baseValue);
+    log("Rate: ", rate);
   }, [baseCountry, targetCountry, baseValue]);
 
   // async function findCountryDetails(countryCode) {
@@ -104,7 +103,7 @@ export default function Main() {
   //     );
   //     if (!response.ok) throw new Error("Network response was not ok");
   //     const data = await response.json();
-  //     // console.log(data);
+  //     // log(data);
   //     return data;
   //   } catch (error) {
   //     console.error("There was a problem with the fetch operation:", error);
@@ -126,26 +125,22 @@ export default function Main() {
   }
 
   function handleCurrencySelection(currency, source) {
-    console.log(
-      "Starting handleCurrencySelection function...",
-      currency,
-      source
-    );
+    log("Starting handleCurrencySelection function...", currency, source);
     // if(base)
     try {
       for (let i = 0; i < allCurrencies.length - 1; i++) {
-        // console.log("i: ", i);
+        // log("i: ", i);
         if (allCurrencies[i].name === currency) {
           if (source === "baseCurrency") {
             setBaseCountry([allCurrencies[i]]);
-            // console.log("setBaseCountry");
+            // log("setBaseCountry");
             setBaseCurrency(allCurrencies[i].currencyCode);
-            // console.log("setBaseCurrency");
+            // log("setBaseCurrency");
           } else if (source === "targetCurrency") {
             setTargetCountry([allCurrencies[i]]);
-            // console.log("setTargetCountry");
+            // log("setTargetCountry");
             setTargetCurrency(allCurrencies[i].currencyCode);
-            // console.log("setTargetCurrency");
+            // log("setTargetCurrency");
           } else {
             throw new Error("Edge Case while setting the country or currency");
           }
@@ -159,7 +154,7 @@ export default function Main() {
   }
 
   // function handleOptionChange(countryCodes, source) {
-  //   console.log(
+  //   log(
   //     "Handle change happening now...Value was:",
   //     countryCodes,
   //     "arose from:",
@@ -170,7 +165,7 @@ export default function Main() {
   //     if (source === "baseCurrency") {
   //       try {
   //         const countryDetails = await findCountryDetails(countryCode);
-  //         console.log("Changing Base: ", countryDetails);
+  //         log("Changing Base: ", countryDetails);
   //         setBaseCountry(countryDetails[0]);
   //         setBaseCurrency(countryDetails[0]);
   //       } catch (err) {
@@ -182,7 +177,7 @@ export default function Main() {
   //     } else if (source === "targetCurrency") {
   //       try {
   //         const countryDetails = await findCountryDetails(countryCode);
-  //         console.log("Changing Target: ", countryDetails);
+  //         log("Changing Target: ", countryDetails);
   //         setTargetCountry(countryDetails[0]);
   //         setTargetCurrency(countryDetails[0]);
   //       } catch (err) {
