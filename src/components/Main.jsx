@@ -18,8 +18,9 @@ export default function Main() {
   // Countries
   const [baseCountry, setBaseCountry] = useState("");
   const [targetCountry, setTargetCountry] = useState("");
-  // Rate
+  // Base Value
   const [baseValue, setBaseValue] = useState("1");
+  // Rate
   const [rate, setRate] = useState("");
   const [allRates, setAllRates] = useState("");
 
@@ -152,7 +153,7 @@ export default function Main() {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center max-h-screen text-2xl transition-all duration-300`}
+      className={`flex flex-col items-center justify-center max-h-auto text-2xl transition-all duration-300 max-w-screen overflow-x-hidden`}
     >
       {!isLoading && (
         <div className="flex flex-col items-start my-5 w-2xs md:w-125">
@@ -188,6 +189,7 @@ export default function Main() {
           handleCurrencySelection={handleCurrencySelection} // passing down handleOptionChange function
         />
       </form>
+      <footer className="mt-8 text-base text-gray-400">Made by <a className="link"href="https://github.com/RockyBoiOff/">Vans</a> &copy; 2025</footer>
     </div>
   );
 }

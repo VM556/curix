@@ -1,17 +1,26 @@
 import FullInputSkeleton from "./skeletons/FullInputSkeleton";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
+import { BackspaceIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import log from "../utils/logger";
+import FlagSkeleton from "./skeletons/FlagSkeleton";
 
 export default function FullInput(props) {
+  const [flagLoaded, setFlagLoaded] = useState(
+    Array(props?.country?.countryFlags.length).fill(false)
+  );
+
+  useEffect(() => {
+    log("Flags Loaded", flagLoaded);
+  }, [flagLoaded]);
+
   const { darkMode } = useTheme();
   const symbolOnRight = /[a-zA-Z]/.test(props?.country?.symbol || "");
 
   function handleInputChange(e) {
     let value = e.replace(/,/g, "");
     log("Input value:", value);
-    log(typeof value); // --STRING INCOMING
 
     // Allow empty string, numbers, and single decimal point and only upto 3 digits after decimal point
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
@@ -33,16 +42,41 @@ export default function FullInput(props) {
     }
   }
 
+  const handleClear = () => {
+    if (props.htmlFor === "baseCurrency") {
+      props.setBaseValue("0");
+    }
+  };
+
   return (
     <>
       <Suspense fallback={<FullInputSkeleton />}>
         {props.isLoading ? (
           <FullInputSkeleton>
-            <div className="skeleton w-12 h-12 rounded-full"></div>
+            <div className="skeleton w-10 h-10 rounded-sm"></div>
           </FullInputSkeleton>
         ) : (
           <div className="card w-2xs md:w-lg bg-base-100 shadow-xl border border-gray-300">
             <div className="card-body ">
+              {props.htmlFor === "baseCurrency" &&
+                props.baseValue.length >= 3 && (
+                  <button
+                    onClick={handleClear}
+                    type="button"
+                    className={clsx(
+                      darkMode
+                        ? "text-red-700 border-red-700 hover:bg-red-950 active:bg-red-950"
+                        : "text-red-600 border-red-600 hover:bg-red-800 active:bg-red-800",
+                      "btn h-auto shadow px-1 pr-1.25 btn-outline transform-transition duration-200 hover:scale-110 rounded-md absolute top-2 right-2 active:bg-transparent"
+                    )}
+                    aria-label="Clear input"
+                  >
+                    <span className="flex justify-between items-center">
+                      <BackspaceIcon className="size-5" />
+                      <p className="pt-1">Clear</p>
+                    </span>
+                  </button>
+                )}
               <h2 className="card-title text-base-content">{props.name}</h2>
 
               {/* Flags Container */}
@@ -54,10 +88,15 @@ export default function FullInput(props) {
                       className="tooltip"
                       data-tip={props?.country?.countries?.[index] || "Unknown"}
                     >
+                      {!flagLoaded && <FlagSkeleton />}
                       <img
                         src={flag}
                         alt={props?.country?.name}
-                        className="w-14 h-9 object-cover rounded-md"
+                        onLoad={() => setFlagLoaded(true)}
+                        className={clsx(
+                          "w-14 h-9 object-cover rounded-md transition-opacity duration-300",
+                          flagLoaded ? "opacity-100" : "opacity-0 absolute"
+                        )}
                       />
                     </div>
                   ))}
@@ -67,7 +106,7 @@ export default function FullInput(props) {
               <div
                 className={clsx(
                   darkMode ? "bg-gray-800" : "bg-gray-200",
-                  "join w-full rounded-box flex flex-col sm:flex-row items-center justify-center"
+                  "join w-full rounded-box flex flex-col md:flex-row items-center justify-center"
                 )}
               >
                 <div className="join-item relative w-full sm:w-fit flex items-center justify-end ">
@@ -82,7 +121,9 @@ export default function FullInput(props) {
                     pattern="[0-9]*"
                     value={
                       props.rate ??
-                      (props.baseValue && props.baseValue.slice(-1) === "."
+                      (props.baseValue === ""
+                        ? " "
+                        : props.baseValue.slice(-1) === "."
                         ? props.baseValue.slice(0, -1) + "."
                         : props.baseValue)
                     }
@@ -107,7 +148,7 @@ export default function FullInput(props) {
                 <div className="divider divider-vertical m-0 md:divider-horizontal" />
 
                 <select
-                  className="select select-ghost join-item  text-xl focus:outline-none focus:bg-transparent active:bg-transparent"
+                  className="select select-ghost join-item text-xl focus:outline-none focus:bg-transparent active:bg-transparent"
                   value={props?.country?.name}
                   onChange={(e) => {
                     props.handleCurrencySelection(

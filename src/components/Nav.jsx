@@ -1,4 +1,3 @@
-// import { useState, useEffect } from "react";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 import { useTheme } from "../contexts/ThemeContext";
 import clsx from "clsx";
@@ -7,14 +6,6 @@ import log from '../utils/logger'
 
 export default function Nav() {
   const { darkMode, toggleDarkMode } = useTheme();
-
-  // useEffect(() => {
-  //   log("Dark mode:", darkMode);
-  //   document.documentElement.setAttribute(
-  //     "data-theme",
-  //     darkMode ? "dark" : "light"
-  //   );
-  // }, [darkMode]);
 
   return (
     <nav

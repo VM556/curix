@@ -26,3 +26,6 @@ package-lock.json
 *.njsproj
 *.sln
 *.sw?
+
+# Files 
+./src/components/Main_copy.jsx
