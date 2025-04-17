@@ -45,7 +45,7 @@ export default function Main() {
   useEffect(() => {
     async function fetchRate() {
       if (!baseCurrency || !targetCurrency) {
-        console.error("Currency not loaded in fetchRate");
+        log("Currency not loaded in fetchRate");
         return;
       }
       try {
@@ -58,7 +58,7 @@ export default function Main() {
         const data = await response.json();
         log("allRates (OUTGOING):", data.conversion_rates);
         setAllRates(data.conversion_rates);
-        console.info(
+        log(
           `Exchange rate from ${baseCurrency} to ${targetCurrency}: ${data.conversion_rates[targetCurrency]}`
         );
       } catch (err) {
